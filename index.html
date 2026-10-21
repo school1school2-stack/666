@@ -66,83 +66,96 @@
         </div>
     </header>
 
-    <!-- Read-Only Mode Banner -->
-    <div id="readOnlyBanner" class="hidden bg-amber-500 text-slate-950 font-bold px-4 py-2.5 text-center text-sm shadow-md flex items-center justify-center gap-2">
-        <i class="fa-solid fa-eye text-lg"></i>
-        <span>وضع العرض والاستعلام والإحصائيات الإشرافية</span>
-    </div>
+    <!-- Teacher Portal View Container (Shows when ?teacher=ID is in URL) -->
+    <main id="teacherPortalContainer" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
+        <div class="bg-amber-500 text-slate-950 font-bold px-4 py-2.5 text-center text-sm shadow-md rounded-xl flex items-center justify-center gap-2">
+            <i class="fa-solid fa-id-badge text-lg"></i>
+            <span>لوحة تقرير المعلم الفردي المعتمد</span>
+        </div>
 
-    <!-- Teacher Portal View Container (Hidden by default unless ?teacher=ID is set) -->
-    <main id="teacherPortalContainer" class="hidden max-w-4xl mx-auto px-4 py-12 flex-grow w-full">
-        <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-            <div class="bg-blue-950 text-white p-6 sm:p-8 border-b border-blue-900 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-14 h-14 bg-amber-400 text-blue-950 rounded-2xl flex items-center justify-center text-2xl font-black shadow">
-                        <i class="fa-solid fa-chalkboard-user"></i>
-                    </div>
-                    <div>
-                        <h2 id="portalTeacherName" class="text-xl sm:text-2xl font-black text-white">جاري تحميل الاسم...</h2>
-                        <p id="portalTeacherEmail" class="text-blue-200 text-xs mt-1 font-mono"></p>
-                    </div>
+        <!-- Teacher Header Info Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-3.5 bg-blue-50 rounded-2xl text-blue-900 text-2xl">
+                    <i class="fa-solid fa-chalkboard-user"></i>
                 </div>
-                <div class="bg-blue-900/80 px-4 py-2 rounded-xl border border-blue-700 text-xs text-amber-300 font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved"></i> سجل الانضباط الإشرافي المعتمد
+                <div>
+                    <h2 id="portalTeacherName" class="text-xl font-black text-slate-900">جاري تحميل الاسم...</h2>
+                    <p id="portalTeacherEmail" class="text-xs font-mono text-blue-900 mt-0.5"></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200">
+                <div>
+                    <span class="text-xs text-slate-500 font-bold block">معدل الانضباط العام</span>
+                    <span id="portalRateBadge" class="text-lg font-black text-emerald-600">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Statistics Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-emerald-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-emerald-600 font-bold mb-1">أيام الحضور</p>
+                    <h3 id="portalPresent" class="text-2xl font-black text-emerald-600">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-xl">
+                    <i class="fa-solid fa-circle-check"></i>
                 </div>
             </div>
 
-            <div class="p-6 sm:p-8 space-y-6">
-                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-base">معدل الانضباط العام للفترة</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">محسوب بناءً على إجمالي أيام الرصد والحضور والاستئذان</p>
-                    </div>
-                    <div id="portalRateBadge" class="text-xl font-black px-5 py-2.5 rounded-2xl shadow-sm border">
-                        0%
-                    </div>
+            <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-rose-600 font-bold mb-1">أيام الغياب</p>
+                    <h3 id="portalAbsent" class="text-2xl font-black text-rose-600">0</h3>
                 </div>
+                <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 text-xl">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+            </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-center">
-                        <div class="text-xs font-bold text-emerald-700 mb-1">أيام الحضور</div>
-                        <div id="portalPresent" class="text-2xl font-black text-emerald-800">0</div>
-                    </div>
-                    <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl text-center">
-                        <div class="text-xs font-bold text-rose-700 mb-1">أيام الغياب</div>
-                        <div id="portalAbsent" class="text-2xl font-black text-rose-800">0</div>
-                    </div>
-                    <div class="bg-purple-50 border border-purple-200 p-4 rounded-2xl text-center">
-                        <div class="text-xs font-bold text-purple-700 mb-1">أيام الاستئذان</div>
-                        <div id="portalPermission" class="text-2xl font-black text-purple-800">0</div>
-                    </div>
-                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl text-center">
-                        <div class="text-xs font-bold text-amber-700 mb-1">التأخر / بعذر</div>
-                        <div id="portalLate" class="text-2xl font-black text-amber-800">0</div>
-                    </div>
+            <div class="bg-white p-4 rounded-xl border border-purple-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-purple-600 font-bold mb-1">أيام الاستئذان</p>
+                    <h3 id="portalPermission" class="text-2xl font-black text-purple-600">0</h3>
                 </div>
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-xl">
+                    <i class="fa-solid fa-person-walking-arrow-right"></i>
+                </div>
+            </div>
 
-                <div class="border-t border-slate-200 pt-6">
-                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-blue-900"></i> تفاصيل السجل اليومي المسجل
-                    </h4>
-                    <div class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden max-h-64 overflow-y-auto custom-scrollbar">
-                        <table class="w-full text-right text-xs">
-                            <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-3">التاريخ</th>
-                                    <th class="p-3 text-center">الحالة المرصودة</th>
-                                    <th class="p-3 text-center">وقت الرصد</th>
-                                </tr>
-                            </thead>
-                            <tbody id="portalHistoryTableBody" class="divide-y divide-slate-100">
-                                <tr><td colspan="3" class="text-center p-6 text-slate-400">جاري تحميل السجل...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="bg-white p-4 rounded-xl border border-amber-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-amber-600 font-bold mb-1">التأخر / عذر</p>
+                    <h3 id="portalLate" class="text-2xl font-black text-amber-600">0</h3>
                 </div>
+                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-xl">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+            </div>
+        </div>
 
-                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center text-xs text-blue-900 font-semibold">
-                    إدارة ثانوية الأمير عبدالمجيد بالرياض • بإشراف مدير المدرسة د/ عبد الله بن ظافر الشهري
-                </div>
+        <!-- Teacher Attendance History Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-blue-900"></i>
+                    سجل الملاحظات والحضور التفصيلي
+                </h3>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-right border-collapse min-w-[500px]">
+                    <thead>
+                        <tr class="bg-slate-100/80 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
+                            <th class="p-4">تاريخ اليوم</th>
+                            <th class="p-4 text-center">الحالة المرصودة</th>
+                            <th class="p-4 text-center">وقت الرصد</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portalHistoryTableBody" class="divide-y divide-slate-100 text-sm">
+                        <tr><td colspan="3" class="text-center p-6 text-slate-400">جاري تحميل السجل...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
@@ -538,7 +551,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                             نسخ الرابط
                         </button>
                     </div>
-                    <p class="text-[11px] text-slate-500">يمكنك إرسال هذا الرابط مباشرة للمعلم ليطلع على تقريره الفخم والمرتب بصفة مستقلة.</p>
+                    <p class="text-[11px] text-slate-500">قم بنسخ هذا الرابط ومشاركته مع المعلم ليفتح واجهته الخاصة والمرتبة.</p>
                 </div>
             </div>
 
@@ -715,8 +728,6 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             historyBody.innerHTML = '';
 
             let hasHistory = false;
-
-            // ترتيب التواريخ تنازلياً لعرض الأحدث أولاً
             const sortedDates = Object.keys(allAttendanceRecords).sort().reverse();
 
             sortedDates.forEach(date => {
@@ -742,9 +753,9 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
                     tr.innerHTML = `
-                        <td class="p-3 font-medium text-slate-700">${date}</td>
-                        <td class="p-3 text-center">${statusBadge}</td>
-                        <td class="p-3 text-center font-mono text-slate-500">${timeStr}</td>
+                        <td class="p-4 font-medium text-slate-700">${date}</td>
+                        <td class="p-4 text-center">${statusBadge}</td>
+                        <td class="p-4 text-center font-mono text-slate-500">${timeStr}</td>
                     `;
                     historyBody.appendChild(tr);
                 }
@@ -765,14 +776,15 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             const rateBadge = document.getElementById('portalRateBadge');
             rateBadge.textContent = `${rate}%`;
             if (rate >= 85) {
-                rateBadge.className = "text-xl font-black px-5 py-2.5 rounded-2xl shadow-sm border bg-emerald-50 text-emerald-700 border-emerald-200";
+                rateBadge.className = "text-lg font-black text-emerald-600";
             } else {
-                rateBadge.className = "text-xl font-black px-5 py-2.5 rounded-2xl shadow-sm border bg-rose-50 text-rose-700 border-rose-200";
+                rateBadge.className = "text-lg font-black text-rose-600";
             }
         }
 
         function populateTeacherShareDropdown() {
             const select = document.getElementById('selectShareTeacher');
+            if(!select) return;
             select.innerHTML = '<option value="">-- اختر المعلم --</option>';
             students.forEach(s => {
                 const opt = document.createElement('option');
