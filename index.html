@@ -40,6 +40,26 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
+    <!-- Password Protection Overlay -->
+    <div id="authOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md p-8 text-center space-y-6">
+            <div class="w-16 h-16 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-900">منطقة مقيدة - المدير فقط</h3>
+                <p class="text-xs text-slate-500 mt-1">يرجى إدخال رمز المرور الخاص بلوحة التحكم الإشرافية</p>
+            </div>
+            <div class="space-y-3">
+                <input type="password" id="managerPasswordInput" placeholder="أدخل كلمة المرور..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-center text-lg font-bold tracking-widest focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <button onclick="verifyManagerPassword()" class="w-full bg-blue-950 hover:bg-blue-900 text-white font-bold py-3 rounded-xl shadow transition text-sm">
+                    دخول النظام
+                </button>
+            </div>
+            <p class="text-[11px] text-slate-400">كلمة المرور الافتراضية حالياً: <span class="font-mono font-bold text-slate-600">1447</span></p>
+        </div>
+    </div>
+
     <!-- Header Section -->
     <header class="bg-blue-950 text-white shadow-lg border-b border-blue-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -587,6 +607,9 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         let currentDate = new Date().toISOString().split('T')[0];
         let allAttendanceRecords = {}; 
 
+        // كلمة المرور الخاصة بالمدير (يمكنك تغييرها هنا)
+        const MANAGER_PASSWORD = "1447";
+
         // DOM Elements
         const selectedDateInput = document.getElementById('selectedDate');
         const studentsTableBody = document.getElementById('studentsTableBody');
@@ -606,6 +629,9 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                 isTeacherPortal = true;
                 document.getElementById('mainDashboardContainer').classList.add('hidden');
                 document.getElementById('teacherPortalContainer').classList.remove('hidden');
+            } else {
+                // إذا لم يكن رابط معلم، تحقق من كلمة المرور للمدير
+                checkManagerAuth();
             }
 
             selectedDateInput.value = currentDate;
@@ -619,6 +645,25 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             initCloudSync();
             setupEventListeners();
         });
+
+        function checkManagerAuth() {
+            const isAuth = sessionStorage.getItem("manager_authenticated");
+            if (isAuth !== "true") {
+                document.getElementById('authOverlay').classList.remove('hidden');
+            }
+        }
+
+        function verifyManagerPassword() {
+            const val = document.getElementById('managerPasswordInput').value.trim();
+            if (val === MANAGER_PASSWORD) {
+                sessionStorage.setItem("manager_authenticated", "true");
+                document.getElementById('authOverlay').classList.add('hidden');
+                showToast('مرحباً بك يا سعادة المدير 🌟', 'success');
+            } else {
+                showToast('كلمة المرور غير صحيحة!', 'warning');
+                document.getElementById('managerPasswordInput').value = '';
+            }
+        }
 
         function switchTab(tab) {
             const dailySec = document.getElementById('dailySection');
