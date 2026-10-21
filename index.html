@@ -40,23 +40,36 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Password Protection Overlay -->
+    <!-- Password Protection / Setup Overlay -->
     <div id="authOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md p-8 text-center space-y-6">
             <div class="w-16 h-16 bg-blue-50 text-blue-900 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
-                <i class="fa-solid fa-lock"></i>
+                <i id="authIcon" class="fa-solid fa-lock"></i>
             </div>
             <div>
-                <h3 class="text-xl font-black text-slate-900">منطقة مقيدة - المدير فقط</h3>
-                <p class="text-xs text-slate-500 mt-1">يرجى إدخال رمز المرور الخاص بلوحة التحكم الإشرافية</p>
+                <h3 id="authTitle" class="text-xl font-black text-slate-900">تسجيل دخول المدير</h3>
+                <p id="authSubtitle" class="text-xs text-slate-500 mt-1">يرجى إدخال كلمة المرور السحابية الخاصة بك</p>
             </div>
-            <div class="space-y-3">
+            
+            <!-- Login View -->
+            <div id="loginView" class="space-y-4">
                 <input type="password" id="managerPasswordInput" placeholder="أدخل كلمة المرور..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-center text-lg font-bold tracking-widest focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <button onclick="verifyManagerPassword()" class="w-full bg-blue-950 hover:bg-blue-900 text-white font-bold py-3 rounded-xl shadow transition text-sm">
                     دخول النظام
                 </button>
             </div>
-            <p class="text-[11px] text-slate-400">كلمة المرور الافتراضية حالياً: <span class="font-mono font-bold text-slate-600">1447</span></p>
+
+            <!-- Setup New Password View (First Time) -->
+            <div id="setupView" class="space-y-3 hidden">
+                <p class="text-xs font-semibold text-amber-600 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                    لم يتم ضبط كلمة مرور سحابية لهذا النظام بعد. يرجى إنشاء رمز سري جديد وحفظه في السحابة:
+                </p>
+                <input type="password" id="newPasswordInput" placeholder="أدخل كلمة المرور الجديدة..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-center text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <input type="password" id="confirmPasswordInput" placeholder="تأكيد كلمة المرور الجديدة..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-center text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <button onclick="saveNewManagerPassword()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> حفظ الرمز السري الجديد في السحابة
+                </button>
+            </div>
         </div>
     </div>
 
@@ -606,9 +619,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         let attendanceData = {}; 
         let currentDate = new Date().toISOString().split('T')[0];
         let allAttendanceRecords = {}; 
-
-        // كلمة المرور الخاصة بالمدير (يمكنك تغييرها هنا)
-        const MANAGER_PASSWORD = "1447";
+        let cloudManagerPassword = null;
 
         // DOM Elements
         const selectedDateInput = document.getElementById('selectedDate');
@@ -630,8 +641,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                 document.getElementById('mainDashboardContainer').classList.add('hidden');
                 document.getElementById('teacherPortalContainer').classList.remove('hidden');
             } else {
-                // إذا لم يكن رابط معلم، تحقق من كلمة المرور للمدير
-                checkManagerAuth();
+                checkCloudManagerPassword();
             }
 
             selectedDateInput.value = currentDate;
@@ -646,22 +656,75 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             setupEventListeners();
         });
 
-        function checkManagerAuth() {
-            const isAuth = sessionStorage.getItem("manager_authenticated");
-            if (isAuth !== "true") {
-                document.getElementById('authOverlay').classList.remove('hidden');
-            }
+        // التحقق من وجود كلمة المرور في السحابة
+        function checkCloudManagerPassword() {
+            db.collection("system_settings").doc("manager_auth").get().then((doc) => {
+                const overlay = document.getElementById('authOverlay');
+                const loginView = document.getElementById('loginView');
+                const setupView = document.getElementById('setupView');
+                const authTitle = document.getElementById('authTitle');
+                const authSubtitle = document.getElementById('authSubtitle');
+                const authIcon = document.getElementById('authIcon');
+
+                if (doc.exists && doc.data().password) {
+                    cloudManagerPassword = doc.data().password;
+                    const isAuth = sessionStorage.getItem("manager_authenticated");
+                    if (isAuth !== "true") {
+                        overlay.classList.remove('hidden');
+                        loginView.classList.remove('hidden');
+                        setupView.classList.add('hidden');
+                    }
+                } else {
+                    // إذا لم تكن موجودة، اطلب إنشاء كلمة مرور جديدة سحابياً
+                    overlay.classList.remove('hidden');
+                    loginView.classList.add('hidden');
+                    setupView.classList.remove('hidden');
+                    authTitle.textContent = "إنشاء كلمة المرور الإشرافية";
+                    authSubtitle.textContent = "هذه هي المرة الأولى، يرجى تعيين رمز سري جديد يحفظ في السحابة";
+                    authIcon.className = "fa-solid fa-key text-amber-600";
+                }
+            }).catch((err) => {
+                console.error("Auth check error:", err);
+            });
         }
 
         function verifyManagerPassword() {
             const val = document.getElementById('managerPasswordInput').value.trim();
-            if (val === MANAGER_PASSWORD) {
+            if (val === cloudManagerPassword) {
                 sessionStorage.setItem("manager_authenticated", "true");
                 document.getElementById('authOverlay').classList.add('hidden');
                 showToast('مرحباً بك يا سعادة المدير 🌟', 'success');
             } else {
                 showToast('كلمة المرور غير صحيحة!', 'warning');
                 document.getElementById('managerPasswordInput').value = '';
+            }
+        }
+
+        async function saveNewManagerPassword() {
+            const p1 = document.getElementById('newPasswordInput').value.trim();
+            const p2 = document.getElementById('confirmPasswordInput').value.trim();
+
+            if (!p1 || p1.length < 4) {
+                showToast('يرجى إدخال كلمة مرور تتكون من 4 خانات على الأقل', 'warning');
+                return;
+            }
+            if (p1 !== p2) {
+                showToast('كلمات المرور غير متطابقة!', 'warning');
+                return;
+            }
+
+            try {
+                await db.collection("system_settings").doc("manager_auth").set({
+                    password: p1,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                cloudManagerPassword = p1;
+                sessionStorage.setItem("manager_authenticated", "true");
+                document.getElementById('authOverlay').classList.add('hidden');
+                showToast('تم حفظ كلمة المرور الجديدة في السحابة بنجاح ☁️', 'cloud');
+            } catch (error) {
+                console.error("Save password error:", error);
+                showToast('فشل حفظ كلمة المرور في السحابة', 'warning');
             }
         }
 
