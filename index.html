@@ -55,8 +55,8 @@
             
             <div class="flex items-center gap-3">
                 <button onclick="openTeacherShareModal()" class="bg-amber-400 hover:bg-amber-500 text-blue-950 font-bold px-3.5 py-2 rounded-lg border border-amber-300 shadow flex items-center gap-2 text-sm transition">
-                    <i class="fa-solid fa-share-nodes text-blue-950"></i>
-                    <span>مشاركة تقرير معلم (فردي)</span>
+                    <i class="fa-solid fa-link text-blue-950"></i>
+                    <span>إصدار رابط تقرير معلم</span>
                 </button>
                 <div id="cloudBadge" class="bg-blue-900/80 px-4 py-2 rounded-lg border border-blue-700/50 flex items-center gap-2 text-sm">
                     <i id="cloudIcon" class="fa-solid fa-cloud text-amber-400 animate-pulse"></i>
@@ -72,7 +72,83 @@
         <span>وضع العرض والاستعلام والإحصائيات الإشرافية</span>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+    <!-- Teacher Portal View Container (Hidden by default unless ?teacher=ID is set) -->
+    <main id="teacherPortalContainer" class="hidden max-w-4xl mx-auto px-4 py-12 flex-grow w-full">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="bg-blue-950 text-white p-6 sm:p-8 border-b border-blue-900 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 bg-amber-400 text-blue-950 rounded-2xl flex items-center justify-center text-2xl font-black shadow">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                        <h2 id="portalTeacherName" class="text-xl sm:text-2xl font-black text-white">جاري تحميل الاسم...</h2>
+                        <p id="portalTeacherEmail" class="text-blue-200 text-xs mt-1 font-mono"></p>
+                    </div>
+                </div>
+                <div class="bg-blue-900/80 px-4 py-2 rounded-xl border border-blue-700 text-xs text-amber-300 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved"></i> سجل الانضباط الإشرافي المعتمد
+                </div>
+            </div>
+
+            <div class="p-6 sm:p-8 space-y-6">
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">معدل الانضباط العام للفترة</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">محسوب بناءً على إجمالي أيام الرصد والحضور والاستئذان</p>
+                    </div>
+                    <div id="portalRateBadge" class="text-xl font-black px-5 py-2.5 rounded-2xl shadow-sm border">
+                        0%
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-center">
+                        <div class="text-xs font-bold text-emerald-700 mb-1">أيام الحضور</div>
+                        <div id="portalPresent" class="text-2xl font-black text-emerald-800">0</div>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl text-center">
+                        <div class="text-xs font-bold text-rose-700 mb-1">أيام الغياب</div>
+                        <div id="portalAbsent" class="text-2xl font-black text-rose-800">0</div>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-200 p-4 rounded-2xl text-center">
+                        <div class="text-xs font-bold text-purple-700 mb-1">أيام الاستئذان</div>
+                        <div id="portalPermission" class="text-2xl font-black text-purple-800">0</div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl text-center">
+                        <div class="text-xs font-bold text-amber-700 mb-1">التأخر / بعذر</div>
+                        <div id="portalLate" class="text-2xl font-black text-amber-800">0</div>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-6">
+                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-blue-900"></i> تفاصيل السجل اليومي المسجل
+                    </h4>
+                    <div class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden max-h-64 overflow-y-auto custom-scrollbar">
+                        <table class="w-full text-right text-xs">
+                            <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">التاريخ</th>
+                                    <th class="p-3 text-center">الحالة المرصودة</th>
+                                    <th class="p-3 text-center">وقت الرصد</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portalHistoryTableBody" class="divide-y divide-slate-100">
+                                <tr><td colspan="3" class="text-center p-6 text-slate-400">جاري تحميل السجل...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center text-xs text-blue-900 font-semibold">
+                    إدارة ثانوية الأمير عبدالمجيد بالرياض • بإشراف مدير المدرسة د/ عبد الله بن ظافر الشهري
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Main Dashboard Container -->
+    <main id="mainDashboardContainer" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
 
         <!-- Navigation Tabs -->
         <div id="tabsContainer" class="flex border-b border-slate-200 mb-6 bg-white rounded-t-xl px-4 pt-2">
@@ -432,13 +508,13 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         <span id="toastText">تم الحفظ بنجاح</span>
     </div>
 
-    <!-- Modal Share Single Teacher Report -->
+    <!-- Modal Generate Single Teacher URL Link -->
     <div id="teacherShareModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 w-full max-w-lg overflow-hidden transform transition-all">
             <div class="p-5 bg-blue-950 text-white flex justify-between items-center">
                 <h3 class="text-lg font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-user-check text-amber-300"></i>
-                    مشاركة تقرير معلم (فردي)
+                    <i class="fa-solid fa-link text-amber-300"></i>
+                    إصدار رابط تقرير معلم مخصص
                 </h3>
                 <button onclick="closeTeacherShareModal()" class="text-blue-200 hover:text-white transition">
                     <i class="fa-solid fa-xmark text-xl"></i>
@@ -447,42 +523,22 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">اختر المعلم المطلوب استعراض وإرسال تقريره:</label>
-                    <select id="selectShareTeacher" onchange="updateTeacherPreviewDetails()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">اختر المعلم لإصدار رابطه الخاص:</label>
+                    <select id="selectShareTeacher" onchange="generateTeacherPortalUrl()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <option value="">-- اختر المعلم --</option>
                     </select>
                 </div>
 
-                <div id="teacherPreviewCard" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                        <span id="previewTeacherName" class="font-bold text-slate-900 text-sm"></span>
-                        <span id="previewTeacherRate" class="text-xs font-bold px-2 py-0.5 rounded-full"></span>
+                <div id="teacherUrlBox" class="hidden space-y-2 pt-2">
+                    <label class="block text-xs font-bold text-slate-700">رابط التقرير الفردي الخاص بالمعلم:</label>
+                    <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+                        <input type="text" id="teacherGeneratedUrlInput" readonly value="" class="bg-transparent text-xs font-mono font-bold text-slate-700 w-full focus:outline-none">
+                        <button onclick="copyGeneratedTeacherUrl()" class="bg-blue-900 hover:bg-blue-950 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shrink-0">
+                            <i class="fa-regular fa-copy"></i>
+                            نسخ الرابط
+                        </button>
                     </div>
-                    <div class="grid grid-cols-4 gap-2 text-center text-xs font-bold">
-                        <div class="bg-emerald-50 text-emerald-700 p-2 rounded-lg border border-emerald-100">
-                            <div>حضور</div>
-                            <div id="prevPresent" class="text-base mt-1">0</div>
-                        </div>
-                        <div class="bg-rose-50 text-rose-700 p-2 rounded-lg border border-rose-100">
-                            <div>غياب</div>
-                            <div id="prevAbsent" class="text-base mt-1">0</div>
-                        </div>
-                        <div class="bg-purple-50 text-purple-700 p-2 rounded-lg border border-purple-100">
-                            <div>استئذان</div>
-                            <div id="prevPermission" class="text-base mt-1">0</div>
-                        </div>
-                        <div class="bg-amber-50 text-amber-700 p-2 rounded-lg border border-amber-100">
-                            <div>تأخر/عذر</div>
-                            <div id="prevLate" class="text-base mt-1">0</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <button id="whatsappTeacherBtn" onclick="sendSingleTeacherWhatsApp()" disabled class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow">
-                        <i class="fa-brands fa-whatsapp text-lg"></i>
-                        إرسال التقرير للمعلم عبر واتساب
-                    </button>
+                    <p class="text-[11px] text-slate-500">يمكنك إرسال هذا الرابط مباشرة للمعلم ليطلع على تقريره الفخم والمرتب بصفة مستقلة.</p>
                 </div>
             </div>
 
@@ -511,7 +567,8 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         const db = firebase.firestore();
 
         // Application State
-        let isReadOnly = false; 
+        let isTeacherPortal = false;
+        let targetTeacherId = null;
         let students = []; 
         let attendanceData = {}; 
         let currentDate = new Date().toISOString().split('T')[0];
@@ -530,9 +587,12 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
 
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('mode') === 'view') {
-                isReadOnly = true;
-                applyReadOnlyMode();
+            targetTeacherId = urlParams.get('teacher');
+
+            if (targetTeacherId) {
+                isTeacherPortal = true;
+                document.getElementById('mainDashboardContainer').classList.add('hidden');
+                document.getElementById('teacherPortalContainer').classList.remove('hidden');
             }
 
             selectedDateInput.value = currentDate;
@@ -546,16 +606,6 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             initCloudSync();
             setupEventListeners();
         });
-
-        function applyReadOnlyMode() {
-            document.getElementById('readOnlyBanner').classList.remove('hidden');
-            document.getElementById('quickAddControls').classList.add('hidden');
-            document.getElementById('openAddModalBtn').classList.add('hidden');
-            document.getElementById('tabsContainer').classList.add('hidden');
-            
-            document.getElementById('dailySection').classList.add('hidden');
-            document.getElementById('reportsSection').classList.remove('hidden');
-        }
 
         function switchTab(tab) {
             const dailySec = document.getElementById('dailySection');
@@ -624,8 +674,10 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                 // الترتيب الأبجدي التلقائي
                 students.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
                 
-                // تحديث قائمة المعلمين في Modal المشاركة الفردية
                 populateTeacherShareDropdown();
+                if (isTeacherPortal && students.length > 0) {
+                    renderTeacherPortalView();
+                }
 
                 fetchAttendanceForDate(currentDate);
                 cloudStatus.textContent = "السحابة: متصل ومزامن (aaaa-a2380)";
@@ -642,8 +694,81 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                     allAttendanceRecords[doc.id] = doc.data().records || {};
                 });
                 renderSingleDayReport();
-                if (isReadOnly) generateReport();
+                if (isTeacherPortal) {
+                    renderTeacherPortalView();
+                }
             });
+        }
+
+        function renderTeacherPortalView() {
+            const student = students.find(s => s.id === targetTeacherId);
+            if (!student) {
+                document.getElementById('portalTeacherName').textContent = "عذراً، المعلم غير موجود أو تم حذفه";
+                return;
+            }
+
+            document.getElementById('portalTeacherName').textContent = `الأستاذ الفاضل / ${student.name}`;
+            document.getElementById('portalTeacherEmail').textContent = student.email;
+
+            let present = 0, absent = 0, permission = 0, late = 0;
+            const historyBody = document.getElementById('portalHistoryTableBody');
+            historyBody.innerHTML = '';
+
+            let hasHistory = false;
+
+            // ترتيب التواريخ تنازلياً لعرض الأحدث أولاً
+            const sortedDates = Object.keys(allAttendanceRecords).sort().reverse();
+
+            sortedDates.forEach(date => {
+                const dayRecords = allAttendanceRecords[date] || {};
+                const recordObj = dayRecords[targetTeacherId];
+                if (recordObj) {
+                    hasHistory = true;
+                    const st = typeof recordObj === 'object' && recordObj !== null ? recordObj.status : recordObj;
+                    const timeStr = typeof recordObj === 'object' && recordObj !== null ? recordObj.time : '-';
+
+                    if (st === 'present') present++;
+                    else if (st === 'absent') absent++;
+                    else if (st === 'permission') permission++;
+                    else if (st === 'late' || st === 'excused') late++;
+
+                    let statusBadge = '<span class="px-2 py-0.5 rounded font-bold bg-slate-100 text-slate-600">مسجل</span>';
+                    if (st === 'present') statusBadge = '<span class="px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800 text-[11px]">حاضر</span>';
+                    else if (st === 'absent') statusBadge = '<span class="px-2.5 py-1 rounded-full font-bold bg-rose-100 text-rose-800 text-[11px]">غائب</span>';
+                    else if (st === 'permission') statusBadge = '<span class="px-2.5 py-1 rounded-full font-bold bg-purple-100 text-purple-800 text-[11px]">مستأذن</span>';
+                    else if (st === 'late') statusBadge = '<span class="px-2.5 py-1 rounded-full font-bold bg-amber-100 text-amber-800 text-[11px]">متأخر</span>';
+                    else if (st === 'excused') statusBadge = '<span class="px-2.5 py-1 rounded-full font-bold bg-blue-100 text-blue-800 text-[11px]">إجازة/بعذر</span>';
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+                    tr.innerHTML = `
+                        <td class="p-3 font-medium text-slate-700">${date}</td>
+                        <td class="p-3 text-center">${statusBadge}</td>
+                        <td class="p-3 text-center font-mono text-slate-500">${timeStr}</td>
+                    `;
+                    historyBody.appendChild(tr);
+                }
+            });
+
+            if (!hasHistory) {
+                historyBody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-slate-400">لا توجد سجلات رصد مسجلة حتى الآن</td></tr>`;
+            }
+
+            document.getElementById('portalPresent').textContent = present;
+            document.getElementById('portalAbsent').textContent = absent;
+            document.getElementById('portalPermission').textContent = permission;
+            document.getElementById('portalLate').textContent = late;
+
+            const totalEval = present + absent + permission + late;
+            const rate = totalEval > 0 ? Math.round(((present + permission) / totalEval) * 100) : 0;
+
+            const rateBadge = document.getElementById('portalRateBadge');
+            rateBadge.textContent = `${rate}%`;
+            if (rate >= 85) {
+                rateBadge.className = "text-xl font-black px-5 py-2.5 rounded-2xl shadow-sm border bg-emerald-50 text-emerald-700 border-emerald-200";
+            } else {
+                rateBadge.className = "text-xl font-black px-5 py-2.5 rounded-2xl shadow-sm border bg-rose-50 text-rose-700 border-rose-200";
+            }
         }
 
         function populateTeacherShareDropdown() {
@@ -660,8 +785,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         function openTeacherShareModal() {
             populateTeacherShareDropdown();
             document.getElementById('selectShareTeacher').value = "";
-            document.getElementById('teacherPreviewCard').classList.add('hidden');
-            document.getElementById('whatsappTeacherBtn').disabled = true;
+            document.getElementById('teacherUrlBox').classList.add('hidden');
             document.getElementById('teacherShareModal').classList.remove('hidden');
         }
 
@@ -669,75 +793,27 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             document.getElementById('teacherShareModal').classList.add('hidden');
         }
 
-        function updateTeacherPreviewDetails() {
+        function generateTeacherPortalUrl() {
             const studentId = document.getElementById('selectShareTeacher').value;
-            const previewCard = document.getElementById('teacherPreviewCard');
-            const whatsappBtn = document.getElementById('whatsappTeacherBtn');
+            const urlBox = document.getElementById('teacherUrlBox');
 
             if (!studentId) {
-                previewCard.classList.add('hidden');
-                whatsappBtn.disabled = true;
+                urlBox.classList.add('hidden');
                 return;
             }
 
-            const student = students.find(s => s.id === studentId);
-            if (!student) return;
-
-            let present = 0, absent = 0, permission = 0, late = 0;
-            Object.keys(allAttendanceRecords).forEach(date => {
-                const dayRecords = allAttendanceRecords[date] || {};
-                const recordObj = dayRecords[studentId];
-                if (recordObj) {
-                    const st = typeof recordObj === 'object' && recordObj !== null ? recordObj.status : recordObj;
-                    if (st === 'present') present++;
-                    else if (st === 'absent') absent++;
-                    else if (st === 'permission') permission++;
-                    else if (st === 'late' || st === 'excused') late++;
-                }
-            });
-
-            const totalEval = present + absent + permission + late;
-            const rate = totalEval > 0 ? Math.round(((present + permission) / totalEval) * 100) : 0;
-
-            document.getElementById('previewTeacherName').textContent = student.name;
-            document.getElementById('prevPresent').textContent = present;
-            document.getElementById('prevAbsent').textContent = absent;
-            document.getElementById('prevPermission').textContent = permission;
-            document.getElementById('prevLate').textContent = late;
-
-            const rateBadge = document.getElementById('previewTeacherRate');
-            rateBadge.textContent = `نسبة الانضباط: ${rate}%`;
-            rateBadge.className = rate >= 85 ? "text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800" : "text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800";
-
-            previewCard.classList.remove('hidden');
-            whatsappBtn.disabled = false;
+            let baseUrl = window.location.origin + window.location.pathname;
+            const teacherUrl = `${baseUrl}?teacher=${studentId}`;
+            
+            document.getElementById('teacherGeneratedUrlInput').value = teacherUrl;
+            urlBox.classList.remove('hidden');
         }
 
-        function sendSingleTeacherWhatsApp() {
-            const studentId = document.getElementById('selectShareTeacher').value;
-            const student = students.find(s => s.id === studentId);
-            if (!student) return;
-
-            let present = 0, absent = 0, permission = 0, late = 0;
-            Object.keys(allAttendanceRecords).forEach(date => {
-                const dayRecords = allAttendanceRecords[date] || {};
-                const recordObj = dayRecords[studentId];
-                if (recordObj) {
-                    const st = typeof recordObj === 'object' && recordObj !== null ? recordObj.status : recordObj;
-                    if (st === 'present') present++;
-                    else if (st === 'absent') absent++;
-                    else if (st === 'permission') permission++;
-                    else if (st === 'late' || st === 'excused') late++;
-                }
-            });
-
-            const totalEval = present + absent + permission + late;
-            const rate = totalEval > 0 ? Math.round(((present + permission) / totalEval) * 100) : 0;
-            const currentDt = getFormattedDateTime();
-
-            const message = `الأستاذ الفاضل / ${student.name} المحترم،%0A%0Aإليكم كشف سجل حضوركم وانضباطكم الإشرافي المعتمد:%0A📅 تاريخ الإصدار: ${currentDt.date} (${currentDt.time})%0A----------------------------------%0A- ✅ أيام الحضور: ${present}%0A- ❌ أيام الغياب: ${absent}%0A- 🚶 أيام الاستئذان: ${permission}%0A- ⏰ التأخر / بعذر: ${late}%0A- 📊 نسبة الانضباط: ${rate}%%0A----------------------------------%0Aمع تمنياتنا لكم بدوام التوفيق والنجاح.%0Aإدارة ثانوية الأمير عبدالمجيد (بإشراف د/ عبد الله الشهري)`;
-
-            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+        function copyGeneratedTeacherUrl() {
+            const input = document.getElementById('teacherGeneratedUrlInput');
+            input.select();
+            document.execCommand('copy');
+            showToast('تم نسخ رابط التقرير الفردي بنجاح 📋', 'success');
         }
 
         function copyCurrentClassData() {
@@ -790,6 +866,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         }
 
         function renderSingleDayReport() {
+            if (isTeacherPortal) return;
             const targetDate = document.getElementById('singleReportDate').value;
             const dayRecords = allAttendanceRecords[targetDate] || {};
 
@@ -862,6 +939,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         }
 
         function generateReport() {
+            if (isTeacherPortal) return;
             const start = document.getElementById('reportStartDate').value;
             const end = document.getElementById('reportEndDate').value;
             const reportTableBody = document.getElementById('reportTableBody');
@@ -1008,13 +1086,14 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                 } else {
                     attendanceData = {};
                 }
-                renderTable();
+                if (!isTeacherPortal) renderTable();
             }, (error) => {
                 console.error("Attendance fetch error:", error);
             });
         }
 
         function renderTable() {
+            if (isTeacherPortal) return;
             const searchTerm = searchInput.value.trim().toLowerCase();
 
             const filteredStudents = students.filter(s => {
@@ -1085,47 +1164,37 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
                         </div>`;
                 }
 
-                if (isReadOnly) {
-                    row.innerHTML = `
-                        <td class="p-4">
-                            <div class="font-bold text-slate-800">${escapeHtml(student.name)}</div>
-                            <div class="text-xs font-mono text-blue-900 mt-0.5">${escapeHtml(student.email)}</div>
-                        </td>
-                        <td class="p-4 text-center">${statusBadge}</td>
-                    `;
-                } else {
-                    row.innerHTML = `
-                        <td class="p-4">
-                            <div class="font-bold text-slate-800">${escapeHtml(student.name)}</div>
-                            <div class="text-xs font-mono text-blue-900 mt-0.5">${escapeHtml(student.email)}</div>
-                        </td>
-                        <td class="p-4 text-center">${statusBadge}</td>
-                        <td class="p-4">
-                            <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                                <button onclick="setStatus('${student.id}', 'present')" class="py-1.5 px-2 rounded-lg text-xs font-bold border transition ${status === 'present' ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50'}">
-                                    <i class="fa-solid fa-check"></i> حاضر
-                                </button>
-                                <button onclick="setStatus('${student.id}', 'absent')" class="py-1.5 px-2 rounded-lg text-xs font-bold border transition ${status === 'absent' ? 'bg-rose-600 text-white border-rose-600 shadow-sm' : 'bg-white text-rose-700 border-rose-200 hover:bg-rose-50'}">
-                                    <i class="fa-solid fa-xmark"></i> غائب
-                                </button>
-                                <button onclick="setStatus('${student.id}', 'permission')" class="py-1.5 px-2 rounded-lg text-xs font-bold border transition ${status === 'permission' ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-white text-purple-700 border-purple-200 hover:bg-purple-50'}">
-                                    <i class="fa-solid fa-person-walking-arrow-right"></i> مستأذن
-                                </button>
-                                <select onchange="setStatus('${student.id}', this.value)" class="py-1.5 px-2 text-xs border border-slate-300 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                                    <option value="" ${status === 'unmarked' ? 'selected' : ''}>أخرى...</option>
-                                    <option value="late" ${status === 'late' ? 'selected' : ''}>متأخر</option>
-                                    <option value="excused" ${status === 'excused' ? 'selected' : ''}>إجازة / بعذر</option>
-                                    <option value="unmarked">مسح الإجراء</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td class="p-4 text-center">
-                            <button onclick="deleteStudent('${student.id}')" class="text-slate-400 hover:text-rose-600 transition p-1 rounded-lg hover:bg-rose-50" title="حذف المعلم من السجل السحابي">
-                                <i class="fa-regular fa-trash-can"></i>
+                row.innerHTML = `
+                    <td class="p-4">
+                        <div class="font-bold text-slate-800">${escapeHtml(student.name)}</div>
+                        <div class="text-xs font-mono text-blue-900 mt-0.5">${escapeHtml(student.email)}</div>
+                    </td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4">
+                        <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                            <button onclick="setStatus('${student.id}', 'present')" class="py-1.5 px-2 rounded-lg text-xs font-bold border transition ${status === 'present' ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50'}">
+                                <i class="fa-solid fa-check"></i> حاضر
                             </button>
-                        </td>
-                    `;
-                }
+                            <button onclick="setStatus('${student.id}', 'absent')" class="py-1.5 px-2 rounded-lg text-xs font-bold border transition ${status === 'absent' ? 'bg-rose-600 text-white border-rose-600 shadow-sm' : 'bg-white text-rose-700 border-rose-200 hover:bg-rose-50'}">
+                                <i class="fa-solid fa-xmark"></i> غائب
+                            </button>
+                            <button onclick="setStatus('${student.id}', 'permission')" class="py-1.5 px-2 rounded-lg text-xs font-bold border transition ${status === 'permission' ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-white text-purple-700 border-purple-200 hover:bg-purple-50'}">
+                                <i class="fa-solid fa-person-walking-arrow-right"></i> مستأذن
+                            </button>
+                            <select onchange="setStatus('${student.id}', this.value)" class="py-1.5 px-2 text-xs border border-slate-300 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                <option value="" ${status === 'unmarked' ? 'selected' : ''}>أخرى...</option>
+                                <option value="late" ${status === 'late' ? 'selected' : ''}>متأخر</option>
+                                <option value="excused" ${status === 'excused' ? 'selected' : ''}>إجازة / بعذر</option>
+                                <option value="unmarked">مسح الإجراء</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="deleteStudent('${student.id}')" class="text-slate-400 hover:text-rose-600 transition p-1 rounded-lg hover:bg-rose-50" title="حذف المعلم من السجل السحابي">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
 
                 studentsTableBody.appendChild(row);
             });
@@ -1134,7 +1203,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         }
 
         window.setStatus = async function(studentId, status) {
-            if (isReadOnly) return;
+            if (isTeacherPortal) return;
             const updatedRecords = { ...attendanceData };
 
             if (status === 'unmarked' || status === '') {
@@ -1162,7 +1231,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         };
 
         window.deleteStudent = async function(studentId) {
-            if (isReadOnly) return;
+            if (isTeacherPortal) return;
             if (!confirm("هل أنت متأكد من حذف هذا المعلم من قاعدة البيانات السحابية؟")) return;
 
             try {
@@ -1174,6 +1243,7 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         };
 
         function updateStats() {
+            if (isTeacherPortal) return;
             let presentCount = 0, absentCount = 0, permissionCount = 0, otherCount = 0;
 
             students.forEach(student => {
@@ -1193,6 +1263,8 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
         }
 
         function setupEventListeners() {
+            if (isTeacherPortal) return;
+
             selectedDateInput.addEventListener('change', (e) => {
                 currentDate = e.target.value;
                 fetchAttendanceForDate(currentDate);
@@ -1207,7 +1279,6 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             searchInput.addEventListener('input', renderTable);
 
             async function addStudentFromInput() {
-                if (isReadOnly) return;
                 const name = quickStudentInput.value.trim();
                 if (!name) {
                     showToast('يرجى اختيار أو كتابة اسم المعلم', 'warning');
@@ -1242,7 +1313,6 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             });
 
             document.getElementById('openAddModalBtn').addEventListener('click', () => {
-                if (isReadOnly) return;
                 let textValue = "";
                 students.forEach(s => {
                     textValue += `${s.name}\n${s.email}\n`;
@@ -1256,7 +1326,6 @@ t789012@moe.gov.sa" class="w-full border border-slate-300 rounded-xl p-3 text-sm
             document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
 
             document.getElementById('saveNamesBtn').addEventListener('click', async () => {
-                if (isReadOnly) return;
                 const rawText = bulkNamesInput.value.trim();
                 const lines = rawText ? rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0) : [];
 
